@@ -1,0 +1,38 @@
+syms w t d b a V x0 th0 C ty
+dens = 1.225 ; % air density
+xr0 = 0.01; % ampitude of displacement
+thr0 = 0.01; % ampitude of AOA
+Vr = 5;
+tr = 0:0.001:2; % time 
+kr1 = 0.005;
+br = 0.001/2; % semi-chord lenght
+xa = 0.2*br; % distance to flexural axis
+omg1 = (kr1*Vr)/br % frequency
+Cr1 = besselh(1, 2, kr1)/(besselh(1, 2, kr1) + 1i * besselh(0, 2, kr1));
+ar = xa/br - 1 ; 
+x = x0*exp(1i*w*t);
+xq1 = @(t88) imag(0.01*exp(1i*28*t88));
+th = th0*exp(1i*w*t);
+x1 = diff(x,t);
+x2 = diff(x1,t);
+th1 = diff(th,t);
+th2 = diff(th1,t);
+L1 = pi*d*(b^2)*(x2+(V*th1)-(b*a*th2));
+L2 = 2*pi*d*V*b*C*(x1+V*th+(b*(0.5-a)*th1));
+L = L1 + L2;
+M = b*(0.5+a)*L - pi*d*(b^3)*(0.5*x2+V*th1+b*(1/8-a/2)*th2);
+fL = matlabFunction(L)
+fM = matlabFunction(M);
+fLL1 = fL(Cr1,Vr,ar,br,dens,tr,thr0,omg1,xr0);
+%fLL2 = fL(Cr2,Vr,ar,br,dens,tr,thr0,omg2,xr0)/(0.5*dens*Vr^2);
+fMM = fM(Cr1,Vr,ar,br,dens,tr,thr0,omg1,xr0);
+plot(tr,imag(fLL1),"r-","LineWidth",1.0)
+hold on
+%plot(tr,real(fLL1),"r-","LineWidth",1.0)
+%fplot(xq1,"r-","LineWidth",1.0)
+title("imaginary part L(t)")
+ylabel("L(t)")
+xlabel("t")
+xlim([0 2])
+grid on
+hold off
